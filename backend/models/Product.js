@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const ProductSchema = new Schema({
-  description: {
+const BaseProductSchema = new Schema({
+  name: {
     type: String,
     required: true,
   },
@@ -10,14 +10,42 @@ const ProductSchema = new Schema({
     type: Number,
     required: true,
   },
-  rating: {
-    type: Number,
-    required: true,
-  },
-  size: {
+  imageUrl: {
     type: String,
-    required: true,
   },
+  category: {
+    type:String,
+    required:true
+  },
+},
+  {discriminatorKey:'categoryType',collection:'products'}
+);
+
+const Product = mongoose.model("Product", BaseProductSchema);
+
+const ElectronicSchema = new mongoose.Schema({
+  brand: { type: String, required: true },
+  model: { type: String },
+  warranty: { type: String },
+  specifications: { type: Object },
 });
 
-module.exports = mongoose.model("product", ProductSchema);
+const CosmeticsSchema = new mongoose.Schema({
+  brand: { type: String, required: true },
+  ingredients: { type: [String] },
+  skinType: { type: String }, // e.g., 'dry', 'oily', 'combination'
+});
+
+// Fashion Schema
+const FashionSchema = new mongoose.Schema({
+  brand: { type: String, required: true },
+  size: { type: String }, // e.g., 'S', 'M', 'L'
+  material: { type: String },
+  gender: { type: String }, // e.g., 'male', 'female', 'unisex'
+});
+
+const Electronics = Product.discriminator('Electronics',ElectronicSchema);
+const Cosmetics = Product.discriminator('Cosmetics', CosmeticsSchema);
+const Fashion = Product.discriminator('Fashion', FashionSchema);
+
+module.exports = {Product,Electronics,Cosmetics,Fashion};
